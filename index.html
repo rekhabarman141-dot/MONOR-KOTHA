@@ -191,11 +191,10 @@
         <p>Official Campus Portal | Tinsukia College</p>
         <p style="margin-top: 20px; font-size: 0.85rem;">System Admin: <a href="mailto:deephzarika175@gmail.com" style="color: #cbd5e1; text-decoration: none;">deephzarika175@gmail.com</a></p>
         <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.4;">&copy; 2026 Tinsukia College Accountability Initiative.</p>
-    </footer>
-
+    </footer> 
     <script>
         // 🛑 PASTE YOUR NEW GOOGLE WEB APP URL HERE:
-        const googleUrl = 'https://script.google.com/macros/s/AKfycbyh6oZ28oLDpxgzt6r6DL1z26DwzfMu4NuCOaSvMLbWKOWodKi0M-ZfaWmDW8pm40bb4g/exec'; 
+        const googleUrl = 'https://script.google.com/macros/s/AKfycbxYG1yzw34oUkur5PZJCHG3mMWaZEmOwoIcaLXjk1egV2uQCD40coLuKEaSMI4vfR06eg/exec'; 
 
         function showPage(pageId) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
@@ -226,6 +225,25 @@
                     data.forEach(item => {
                         const typeClass = item.type === 'Complaint' ? 'complaint' : '';
                         const typeLabelColor = item.type === 'Complaint' ? 'var(--danger)' : 'var(--accent)';
+                        
+                        // Check if an admin reply exists in the backend object
+                        let replyHtml = "";
+                        if (item.reply && item.reply.trim() !== "") {
+                            replyHtml = `
+                                <div style="margin-top: 12px; padding: 12px; background-color: #f0fdf4; border-left: 4px solid #16a34a; border-radius: 6px;">
+                                    <div style="font-weight: 700; color: #14532d; font-size: 0.85rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                        📢 <span>Response from Admin:</span>
+                                    </div>
+                                    <div style="color: #1f2937; font-size: 0.95rem; line-height: 1.5;">
+                                        ${item.reply}
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #6b7280; margin-top: 6px; font-style: italic;">
+                                        Official Moderation Team
+                                    </div>
+                                </div>
+                            `;
+                        }
+
                         const itemHtml = `
                             <div class="feed-item ${typeClass}">
                                 <div class="feed-header">
@@ -233,6 +251,9 @@
                                     <span class="status-badge approved">VERIFIED PUBLIC</span>
                                 </div>
                                 <p class="feed-msg"><strong style="color: ${typeLabelColor}">[${item.type.toUpperCase()}]</strong> ${item.msg}</p>
+                                
+                                ${replyHtml}
+
                                 <div class="feed-meta">
                                     <span>👤 ${item.role}</span>
                                     <span>📅 ${item.date}</span>
