@@ -49,9 +49,12 @@
 
         .brand { color: white; font-weight: 500; display: flex; align-items: center; font-size: 0.9rem;}
         .monor-highlight { color: var(--accent); font-size: 1.8rem; font-weight: 800; margin-right: 12px; letter-spacing: -0.5px; }
-        .nav-links { list-style: none; display: flex; gap: 25px; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
         .nav-links li a { color: #cbd5e1; text-decoration: none; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
         .nav-links li a:hover { color: var(--accent); }
+
+        .btn-auth { background: var(--accent); color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-auth:hover { background: var(--accent-hover); }
 
         .page-content { display: none; padding: 40px 10%; min-height: 85vh; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .active-page { display: block; }
@@ -76,9 +79,16 @@
         label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main); font-size: 0.9rem; }
         input, select, textarea { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px; font-family: inherit; font-size: 1rem; transition: all 0.3s ease; background: #f8fafc; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
-        
+        input[readonly] { background-color: #e2e8f0; cursor: not-allowed; }
+
         .btn-submit { background: var(--accent); color: var(--surface); border: none; padding: 16px 32px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.39); }
         .btn-submit:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); }
+
+        /* Auth Tabs in Auth Box */
+        .auth-container { max-width: 500px; margin: 40px auto; }
+        .auth-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+        .auth-toggle button { flex: 1; padding: 12px; border: none; background: #e2e8f0; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .auth-toggle button.active { background: var(--accent); color: white; }
 
         /* Feed Elements */
         .feed-container h3 { color: var(--primary); font-size: 1.5rem; margin: 35px 0 15px 0; font-weight: 700; display: flex; align-items: center; gap: 10px;}
@@ -117,17 +127,20 @@
             <li><a onclick="showPage('about')">About</a></li>
             <li><a onclick="showPage('portal')">Portal</a></li>
             <li><a onclick="showPage('contact')">Contact</a></li>
+            <li id="authNavSlot"><button class="btn-auth" onclick="showPage('auth')">Login / Register</button></li>
         </ul>
     </nav>
 
+    <!-- HOME PAGE -->
     <div id="home" class="page-content active-page">
         <div class="hero">
             <h1><span style="color: var(--accent);">মনৰ কথা</span></h1>
             <p>The Official Student Voice & Accountability Initiative</p>
-            <button class="btn-submit" style="width: auto; padding: 16px 40px; border-radius: 30px;" onclick="showPage('portal')">Register Your Voice</button>
+            <button class="btn-submit" style="width: auto; padding: 16px 40px; border-radius: 30px;" onclick="handlePortalAccess()">Register Your Voice</button>
         </div>
     </div>
 
+    <!-- ABOUT PAGE -->
     <div id="about" class="page-content">
         <div class="card">
             <h2>The Project Vision</h2>
@@ -135,18 +148,71 @@
         </div>
     </div>
 
+    <!-- AUTHENTICATION PAGE (LOGIN / SIGNUP) -->
+    <div id="auth" class="page-content">
+        <div class="card auth-container">
+            <div class="auth-toggle">
+                <button id="loginTabBtn" class="active" onclick="switchAuthMode('login')">Login</button>
+                <button id="signupTabBtn" onclick="switchAuthMode('signup')">Register</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm">
+                <h2>User Login</h2>
+                <label>Registered Phone Number or Email</label>
+                <input type="text" id="loginId" placeholder="e.g. 9876543210 or email@domain.com" required>
+                
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password" required>
+                
+                <button type="submit" id="loginSubmitBtn" class="btn-submit">Login to Portal</button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="signupForm" style="display: none;">
+                <h2>New User Registration</h2>
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="e.g. Rahul Das" required>
+                
+                <label>Phone Number / Email</label>
+                <input type="text" id="regId" placeholder="e.g. 9876543210 or email@domain.com" required>
+
+                <div class="form-grid">
+                    <div>
+                        <label>Class / Semester</label>
+                        <input type="text" id="regClass" placeholder="e.g. B.Sc 4th Sem" required>
+                    </div>
+                    <div>
+                        <label>Designation</label>
+                        <select id="regRole">
+                            <option>Student</option>
+                            <option>Faculty Member</option>
+                            <option>College Staff</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>Create Password</label>
+                <input type="password" id="regPassword" placeholder="Create a secure password" required>
+
+                <button type="submit" id="signupSubmitBtn" class="btn-submit">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PORTAL PAGE (PROTECTED) -->
     <div id="portal" class="page-content">
         <div class="card">
             <h2>Submit Official Record</h2>
             <form id="submissionForm">
                 <div class="form-grid">
-                    <div><label>Full Name</label><input type="text" id="userName" placeholder="e.g. Rahul Das" required></div>
-                    <div><label>Class / Semester</label><input type="text" id="userClass" placeholder="e.g. B.Sc 4th Sem" required></div>
+                    <div><label>Full Name</label><input type="text" id="userName" readonly required></div>
+                    <div><label>Class / Semester</label><input type="text" id="userClass" readonly required></div>
                 </div>
                 <div class="form-grid">
                     <div>
                         <label>Designation</label>
-                        <select id="userRole"><option>Student</option><option>Faculty Member</option><option>College Staff</option></select>
+                        <input type="text" id="userRole" readonly required>
                     </div>
                     <div>
                         <label>Category</label>
@@ -168,6 +234,7 @@
         </div>
     </div>
 
+    <!-- CONTACT PAGE -->
     <div id="contact" class="page-content">
         <div class="card">
             <h2>Institution Details</h2>
@@ -175,7 +242,7 @@
                 <p style="margin-bottom: 10px;"><strong>Institution:</strong> Tinsukia College</p>
                 <p style="margin-bottom: 10px;"><strong>Location:</strong> Tinsukia, Assam</p>
                 <p style="margin-bottom: 10px;"><strong>Helpline:</strong> <span style="color: var(--primary); font-weight: 600;">+91 - 7896334713</span></p>
-                <p><strong>Admin Email:</strong> <a href="mailto:admin@tinsukiacollege.ac.in" style="color: var(--accent); font-weight: 600; text-decoration: none;">admin@tinsukiacollege.ac.in</a></p>
+                <p><strong>Admin Email:</strong> <a href="mailto:deephzarika175@gmail.com" style="color: var(--accent); font-weight: 600; text-decoration: none;">deephzarika175@gmail.com</a></p>
             </div>
         </div>
         <div class="secretary-card">
@@ -189,21 +256,148 @@
     <footer>
         <span class="footer-logo">মনৰ <span>কথা</span></span>
         <p>Official Campus Portal | Tinsukia College</p>
-        <p style="margin-top: 20px; font-size: 0.85rem;">System Admin: <a href="mailto:admin@tinsukiacollege.ac.in" style="color: #cbd5e1; text-decoration: none;">admin@tinsukiacollege.ac.in</a></p>
+        <p style="margin-top: 20px; font-size: 0.85rem;">System Admin: <a href="mailto:deephzarika175@gmail.com" style="color: #cbd5e1; text-decoration: none;">deephzarika175@gmail.com</a></p>
         <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.4;">&copy; 2026 Tinsukia College Accountability Initiative.</p>
     </footer> 
+
     <script>
-        // 🛑 PASTE YOUR NEW GOOGLE WEB APP URL HERE:
-        const googleUrl = 'https://script.google.com/macros/s/AKfycbxTUV-wcgotadaMzehDCQi2ERFPgv2nhmzWQuGsN5z5XcAJnkACgfPdasUm4yROb1oyvg/exec'; 
+        // Paste your published Google Web App URL here
+        const googleUrl = 'https://script.google.com/macros/s/AKfycby5Dgl7dcX8xrx26G2NARJZXGgz3rcncJy8vbK3gNXRUHu9OKn99Dx-AIjEq4ap7eP6/exec'; 
+
+        let currentUser = JSON.parse(localStorage.getItem('tcUser')) || null;
+
+        function updateAuthUI() {
+            const slot = document.getElementById('authNavSlot');
+            if (currentUser) {
+                slot.innerHTML = `<span style="color:white; font-size:0.85rem; margin-right:10px;">Hi, ${currentUser.name.split(' ')[0]}</span> <button class="btn-auth" style="background:#ef4444;" onclick="logout()">Logout</button>`;
+            } else {
+                slot.innerHTML = `<button class="btn-auth" onclick="showPage('auth')">Login / Register</button>`;
+            }
+        }
 
         function showPage(pageId) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
             document.getElementById(pageId).classList.add('active-page');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            if(pageId === 'portal') fetchPublicFeed();
+            if(pageId === 'portal') {
+                if(!currentUser) {
+                    alert("Please log in or register first to submit a grievance!");
+                    showPage('auth');
+                    return;
+                }
+                populatePortalFields();
+                fetchPublicFeed();
+            }
+        }
+
+        function handlePortalAccess() {
+            if (currentUser) {
+                showPage('portal');
+            } else {
+                showPage('auth');
+            }
+        }
+
+        function populatePortalFields() {
+            if(currentUser) {
+                document.getElementById('userName').value = currentUser.name;
+                document.getElementById('userClass').value = currentUser.userClass;
+                document.getElementById('userRole').value = currentUser.role;
+            }
+        }
+
+        function switchAuthMode(mode) {
+            if(mode === 'login') {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('signupForm').style.display = 'none';
+                document.getElementById('loginTabBtn').classList.add('active');
+                document.getElementById('signupTabBtn').classList.remove('active');
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'block';
+                document.getElementById('signupTabBtn').classList.add('active');
+                document.getElementById('loginTabBtn').classList.remove('active');
+            }
+        }
+
+        // USER REGISTRATION
+        document.getElementById('signupForm').onsubmit = function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('signupSubmitBtn');
+            btn.innerText = "Registering Account...";
+            btn.disabled = true;
+
+            const payload = {
+                action: "signup",
+                name: document.getElementById('regName').value,
+                emailOrPhone: document.getElementById('regId').value,
+                userClass: document.getElementById('regClass').value,
+                role: document.getElementById('regRole').value,
+                password: document.getElementById('regPassword').value
+            };
+
+            fetch(googleUrl, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                btn.innerText = "Create Account";
+                btn.disabled = false;
+                if(res.success) {
+                    switchAuthMode('login');
+                }
+            })
+            .catch(() => {
+                alert("Error connecting to database.");
+                btn.innerText = "Create Account";
+                btn.disabled = false;
+            });
+        };
+
+        // USER LOGIN
+        document.getElementById('loginForm').onsubmit = function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerText = "Authenticating...";
+            btn.disabled = true;
+
+            const payload = {
+                action: "login",
+                emailOrPhone: document.getElementById('loginId').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            fetch(googleUrl, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(res => {
+                btn.innerText = "Login to Portal";
+                btn.disabled = false;
+                if(res.success) {
+                    currentUser = res.user;
+                    localStorage.setItem('tcUser', JSON.stringify(currentUser));
+                    updateAuthUI();
+                    alert("Logged in successfully!");
+                    showPage('portal');
+                } else {
+                    alert(res.message);
+                }
+            })
+            .catch(() => {
+                alert("Login request failed. Check internet connection.");
+                btn.innerText = "Login to Portal";
+                btn.disabled = false;
+            });
+        };
+
+        function logout() {
+            localStorage.removeItem('tcUser');
+            currentUser = null;
+            updateAuthUI();
+            alert("You have logged out.");
+            showPage('home');
         }
 
         window.onload = function() {
+            updateAuthUI();
             const savedLocalData = localStorage.getItem('tcLocalPending_v3');
             if (savedLocalData) document.getElementById('localPendingFeed').innerHTML = savedLocalData;
             fetchPublicFeed();
@@ -217,7 +411,7 @@
             fetch(googleUrl)
                 .then(res => res.json())
                 .then(data => {
-                    if(data.length === 0) {
+                    if(!Array.isArray(data) || data.length === 0) {
                         publicFeed.innerHTML = "<p style='color: var(--text-muted); font-size:0.95rem;'>No messages approved for public display yet.</p>";
                         return;
                     }
@@ -226,7 +420,6 @@
                         const typeClass = item.type === 'Complaint' ? 'complaint' : '';
                         const typeLabelColor = item.type === 'Complaint' ? 'var(--danger)' : 'var(--accent)';
                         
-                        // Check if an admin reply exists in the backend object
                         let replyHtml = "";
                         if (item.reply && item.reply.trim() !== "") {
                             replyHtml = `
@@ -273,43 +466,59 @@
         
         form.onsubmit = function(e) {
             e.preventDefault();
+
+            if (!currentUser) {
+                alert("Authentication missing. Please log in again.");
+                showPage('auth');
+                return;
+            }
+
             submitBtn.innerText = "Transmitting securely...";
             submitBtn.disabled = true;
 
-            const data = {
-                name: document.getElementById('userName').value,
-                uClass: document.getElementById('userClass').value,
-                role: document.getElementById('userRole').value,
+            const payload = {
+                action: "submit",
+                name: currentUser.name,
+                userClass: currentUser.userClass,
+                role: currentUser.role,
                 type: document.getElementById('msgType').value,
-                msg: document.getElementById('userMsg').value
+                msg: document.getElementById('userMsg').value,
+                emailOrPhone: currentUser.emailOrPhone
             };
 
-            fetch(googleUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-            .then(() => {
+            fetch(googleUrl, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(res => {
                 const date = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
-                const typeClass = data.type === 'Complaint' ? 'complaint' : '';
-                const typeLabelColor = data.type === 'Complaint' ? 'var(--danger)' : 'var(--accent)';
+                const typeClass = payload.type === 'Complaint' ? 'complaint' : '';
+                const typeLabelColor = payload.type === 'Complaint' ? 'var(--danger)' : 'var(--accent)';
                 
                 const localFeed = document.getElementById('localPendingFeed');
                 const entryHtml = `
                     <div class="feed-item ${typeClass}">
                         <div class="feed-header">
-                            <div class="user-info"><strong>${data.name}</strong> • ${data.uClass}</div>
+                            <div class="user-info"><strong>${payload.name}</strong> • ${payload.userClass}</div>
                             <span class="status-badge">REVIEW PENDING</span>
                         </div>
-                        <p class="feed-msg"><strong style="color: ${typeLabelColor}">[${data.type.toUpperCase()}]</strong> ${data.msg}</p>
-                        <div class="feed-meta"><span>👤 ${data.role}</span><span>📅 ${date}</span></div>
+                        <p class="feed-msg"><strong style="color: ${typeLabelColor}">[${payload.type.toUpperCase()}]</strong> ${payload.msg}</p>
+                        <div class="feed-meta"><span>👤 ${payload.role}</span><span>📅 ${date}</span></div>
                     </div>`;
 
                 localFeed.insertAdjacentHTML('afterbegin', entryHtml);
                 localStorage.setItem('tcLocalPending_v3', localFeed.innerHTML);
                 
-                form.reset();
+                document.getElementById('userMsg').value = '';
                 submitBtn.innerText = "Submit to Registry";
                 submitBtn.disabled = false;
                 alert("Success: Message logged. It will show on the public board once the admin verifies language standards.");
+            })
+            .catch(() => {
+                alert("Failed to submit message. Try again later.");
+                submitBtn.innerText = "Submit to Registry";
+                submitBtn.disabled = false;
             });
         };
     </script>
 </body>
-</html>
+</html
+                    
